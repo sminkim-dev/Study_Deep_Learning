@@ -1,0 +1,43 @@
+# Python 캐시
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# 가상환경
+.venv/
+venv/
+env/
+
+# Jupyter 임시 파일
+.ipynb_checkpoints/
+
+# 로컬 환경변수·비밀값
+.env
+.env.*
+!.env.example
+
+# 다운로드한 MNIST 데이터
+# 실제 저장 위치에 맞춰 조정
+dataset/*.gz
+dataset/mnist.pkl
+
+# 직접 학습해서 생성한 결과
+checkpoints/
+outputs/
+runs/
+logs/
+wandb/
+*.log
+
+# 편집기 임시 파일
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+
+# 운영체제 부산물
+.DS_Store
+Thumbs.db
