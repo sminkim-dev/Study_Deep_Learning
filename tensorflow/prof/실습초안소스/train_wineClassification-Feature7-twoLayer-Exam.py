@@ -185,43 +185,54 @@ T_test_onehot = one_hot(T_test, 3)
 # 원-핫 인코딩과 데이터 정규화 전처리 과정 설명.docx 참고
 
 network = TwoLayerNet(input_size=7, hidden_size=40, output_size=3)
-
-# === 학습 설정 ===
-iters_num = 300
+# 하이퍼파라미터
+iters_num = 3000  # 반복 횟수를 적절히 설정한다.
 train_size = X_train.shape[0]
-batch_size = 100
-learning_rate = 0.01
+batch_size = 25   # 미니배치 크기
+learning_rate = 0.1
 
-# === 학습 ===
+train_loss_list = []
+train_acc_list = []
+test_acc_list = []
+
+# 1에폭당 반복 수
+iter_per_epoch = max(train_size / batch_size, 1)
+
 for i in range(iters_num):
-
-    # 미니배치 추출
+    # 미니배치 획득
     batch_mask = np.random.choice(train_size, batch_size)
     x_batch = X_train[batch_mask]
     t_batch = T_train_onehot[batch_mask]
-
+    
     # 기울기 계산
-    grad = network.gradient(x_batch, t_batch)
-
-    # 가중치 갱신
+    grad = network.numerical_gradient(x_batch, t_batch)
+    #grad = network.gradient(x_batch, t_batch)
+    
+    # 매개변수 갱신
     for key in ('W1', 'b1', 'W2', 'b2'):
         network.params[key] -= learning_rate * grad[key]
-
-    # 100회마다 학습 결과 출력
-    if i % 100 == 0:
+    
+    # 학습 경과 기록
+    loss = network.loss(x_batch, t_batch)
+    train_loss_list.append(loss)
+    
+    # 1에폭당 정확도 계산
+    if i % iter_per_epoch == 0:
         train_acc = network.accuracy(X_train, T_train_onehot)
         test_acc = network.accuracy(X_test, T_test_onehot)
+        train_acc_list.append(train_acc)
+        test_acc_list.append(test_acc)
+        print("train acc, test acc | " + str(train_acc) + ", " + str(test_acc))
+        
 
-        print("반복:", i)
-        print("학습 정확도: {:.2f}%".format(train_acc * 100))
-        print("테스트 정확도: {:.2f}%".format(test_acc * 100))
-        print("----------------------")
-
-# === 최종 결과 ===
-print("\n===== 최종 학습 결과 =====")
-
-print("최종 학습 정확도: {:.2f}%".format(
-    network.accuracy(X_train, T_train_onehot) * 100))
-
-print("최종 테스트 정확도: {:.2f}%".format(
-    network.accuracy(X_test, T_test_onehot) * 100))
+print("Final : train acc, test acc | " + str(train_acc) + ", " + str(test_acc))
+# 그래프 그리기
+markers = {'train': 'o', 'test': 's'}
+x = np.arange(len(train_acc_list))
+plt.plot(x, train_acc_list, label='train acc')
+plt.plot(x, test_acc_list, label='test acc', linestyle='--')
+plt.xlabel("epochs")
+plt.ylabel("accuracy")
+plt.ylim(0, 1.0)
+plt.legend(loc='lower right')
+plt.show()
